@@ -1,16 +1,11 @@
 package main;
 
 import com.github.javaparser.StaticJavaParser;
-import com.github.javaparser.ast.body.ClassOrInterfaceDeclaration;
-import com.github.javaparser.ast.comments.LineComment;
-import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.UnaryExpr;
-import com.github.javaparser.ast.expr.EnclosedExpr;
-import com.github.javaparser.printer.DefaultPrettyPrinter;
-
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.resolution.types.ResolvedType;
+import com.github.javaparser.ast.expr.EnclosedExpr;
+import com.github.javaparser.ast.expr.Expression;
+import com.github.javaparser.ast.expr.UnaryExpr;
 import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
@@ -27,7 +22,7 @@ public class Main {
     // private static final String FILE_PATH = "src/main/Example1.java";
 
     // Test the expression of which the root of the AST is a unary expression.
-    private static final String FILE_PATH = "src/main/Example1.java";
+    private static final String FILE_PATH = "src/main/Example2.java";
 
 
     public static void main(String[] args) throws Exception {
@@ -40,24 +35,22 @@ public class Main {
         CompilationUnit cu = StaticJavaParser.parse(new FileInputStream(FILE_PATH));
 
         // Find the first recognized expression, which is the boolean propositional logic formula.
-        Expression root = cu.findAll(Expression.class).get(0);
-        System.out.println(((BinaryExpr) root).getLeft().toString());
-        System.out.println(((BinaryExpr) root).getRight().toString());
-        System.out.println(((BinaryExpr) root).getOperator().toString());
 
-        prop2Mp(((BinaryExpr) root).getRight());
+        Expression root = cu.findAll(Expression.class).get(0);
+
+        ParseProp(root);
 
     }
 
-    public static void prop2Mp (Expression child) throws Exception{
+    public static void ParseProp (Expression child) throws Exception{
 
 
         System.out.println("--------------------------------");
 
         if (child instanceof EnclosedExpr) {
             child = ((EnclosedExpr) child).getInner();
-
         }
+
         if (child instanceof BinaryExpr) {
             System.out.println(((BinaryExpr) child).getLeft().toString());
             System.out.println(((BinaryExpr) child).getRight().toString());
@@ -68,35 +61,20 @@ public class Main {
 
             if (((BinaryExpr) child).getLeft() instanceof EnclosedExpr) {
                 left = ((EnclosedExpr) ((BinaryExpr) child).getLeft()).getInner();
-
             }
-
-
             if (((BinaryExpr) child).getRight() instanceof EnclosedExpr) {
                 right = ((EnclosedExpr) ((BinaryExpr) child).getRight()).getInner();
             }
-
-
-
             if (left instanceof BinaryExpr ||left instanceof UnaryExpr) {
-
-                prop2Mp(((BinaryExpr) child).getLeft());
-
-
+                ParseProp(((BinaryExpr) child).getLeft());
             }
-
-
             if (right instanceof BinaryExpr ||right instanceof UnaryExpr) {
-                prop2Mp(((BinaryExpr) child).getRight());
+                ParseProp(((BinaryExpr) child).getRight());
             }
-
-
-
-
-
         }
+
         if (child instanceof UnaryExpr) { //
-            //   System.out.println("3");
+
             System.out.println(((UnaryExpr) child).getOperator());
             System.out.println(((UnaryExpr) child).getExpression());
 
@@ -109,20 +87,13 @@ public class Main {
             }
 
             if (node2 instanceof BinaryExpr) {
-                prop2Mp(node2);
-
-
-
+                ParseProp(node2);
             }
             if (node2 instanceof UnaryExpr) {
-                prop2Mp(node2);
-
-
+                ParseProp(node2);
             }
 
         }
-
-
     }
 }
 
