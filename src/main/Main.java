@@ -11,6 +11,8 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSol
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Main {
@@ -38,48 +40,63 @@ public class Main {
 
         Expression root = cu.findAll(Expression.class).get(0);
 
-        ParseProp(root);
+        Network network = ParseProp(root, new Network());
 
     }
 
-    public static void ParseProp (Expression child) throws Exception{
 
+    public static Network ParseProp (Expression expr, Network network) throws Exception {
 
         System.out.println("--------------------------------");
 
-        if (child instanceof EnclosedExpr) {
-            child = ((EnclosedExpr) child).getInner();
+        // Entering brackets
+        if (expr instanceof EnclosedExpr) {
+            expr = ((EnclosedExpr) expr).getInner();
         }
 
-        if (child instanceof BinaryExpr) {
-            System.out.println(((BinaryExpr) child).getLeft().toString());
-            System.out.println(((BinaryExpr) child).getRight().toString());
-            System.out.println(((BinaryExpr) child).getOperator().toString());
+        if (expr instanceof BinaryExpr) {
 
-            Expression left =  ((BinaryExpr) child).getLeft();
-            Expression right =  ((BinaryExpr) child).getRight();
+            System.out.println(((BinaryExpr) expr).getLeft().toString());
+            System.out.println(((BinaryExpr) expr).getRight().toString());
+            System.out.println(((BinaryExpr) expr).getOperator().toString());
 
-            if (((BinaryExpr) child).getLeft() instanceof EnclosedExpr) {
-                left = ((EnclosedExpr) ((BinaryExpr) child).getLeft()).getInner();
+            ArrayList<Object> neuronInputs = new ArrayList<>();
+            neuronInputs.add(((BinaryExpr) expr).getLeft().toString());
+            neuronInputs.add(((BinaryExpr) expr).getRight().toString());
+            String operator = (((BinaryExpr) expr).getOperator().toString());
+
+            network.addNeuron(neuronInputs, operator);
+
+            Expression left =  ((BinaryExpr) expr).getLeft();
+            Expression right =  ((BinaryExpr) expr).getRight();
+
+            if (((BinaryExpr) expr).getLeft() instanceof EnclosedExpr) {
+                left = ((EnclosedExpr) ((BinaryExpr) expr).getLeft()).getInner();
             }
-            if (((BinaryExpr) child).getRight() instanceof EnclosedExpr) {
-                right = ((EnclosedExpr) ((BinaryExpr) child).getRight()).getInner();
+            if (((BinaryExpr) expr).getRight() instanceof EnclosedExpr) {
+                right = ((EnclosedExpr) ((BinaryExpr) expr).getRight()).getInner();
             }
             if (left instanceof BinaryExpr ||left instanceof UnaryExpr) {
-                ParseProp(((BinaryExpr) child).getLeft());
+                ParseProp(((BinaryExpr) expr).getLeft(), network);
             }
             if (right instanceof BinaryExpr ||right instanceof UnaryExpr) {
-                ParseProp(((BinaryExpr) child).getRight());
+                ParseProp(((BinaryExpr) expr).getRight(), network);
             }
         }
 
-        if (child instanceof UnaryExpr) { //
+        if (expr instanceof UnaryExpr) { //
 
-            System.out.println(((UnaryExpr) child).getOperator());
-            System.out.println(((UnaryExpr) child).getExpression());
+            System.out.println(((UnaryExpr) expr).getOperator());
+            System.out.println(((UnaryExpr) expr).getExpression());
 
-            Expression node2 = child;
-            Expression child2 = ((UnaryExpr) child).getExpression();
+            ArrayList<Object> neuronInputs = new ArrayList<>();
+            neuronInputs.add(((UnaryExpr) expr).getOperator().toString());
+            String operator = (((UnaryExpr) expr).getExpression().toString());
+
+            network.addNeuron(neuronInputs, operator);
+
+            Expression node2 = expr;
+            Expression child2 = ((UnaryExpr) expr).getExpression();
             // for each node, also need to check whether it is enclosed expression with brackets
             if (child2 instanceof EnclosedExpr) {
                 //System.out.println(((EnclosedExpr) child2).getInner());
@@ -87,13 +104,14 @@ public class Main {
             }
 
             if (node2 instanceof BinaryExpr) {
-                ParseProp(node2);
+                ParseProp(node2, network);
             }
             if (node2 instanceof UnaryExpr) {
-                ParseProp(node2);
+                ParseProp(node2, network);
             }
 
         }
+        return network;
     }
 }
 
