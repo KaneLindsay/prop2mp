@@ -24,7 +24,7 @@ public class Main {
     // private static final String FILE_PATH = "src/main/Example1.java";
 
     // Test the expression of which the root of the AST is a unary expression.
-    private static final String FILE_PATH = "src/main/Example2.java";
+    private static final String FILE_PATH = "src/main/Example1.java";
 
 
     public static void main(String[] args) throws Exception {
@@ -41,6 +41,8 @@ public class Main {
         Expression root = cu.findAll(Expression.class).get(0);
 
         Network network = ParseProp(root, new Network());
+        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~");
+        network.testNetwork(network.getRoot());
 
     }
 
@@ -90,8 +92,8 @@ public class Main {
             System.out.println(((UnaryExpr) expr).getExpression());
 
             ArrayList<Object> neuronInputs = new ArrayList<>();
-            neuronInputs.add(((UnaryExpr) expr).getOperator().toString());
-            String operator = (((UnaryExpr) expr).getExpression().toString());
+            neuronInputs.add(((UnaryExpr) expr).getExpression().toString());
+            String operator = (((UnaryExpr) expr).getOperator().toString());
 
             network.addNeuron(neuronInputs, operator);
 

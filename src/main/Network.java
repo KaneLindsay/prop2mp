@@ -20,6 +20,7 @@ public class Network {
         if (root == null) {
             root = new Neuron(inputs, neuronType,null);
             pointer = root;
+            System.out.println("DEBUG ROOT:" + neuronType);
             return;
         }
 
@@ -28,8 +29,8 @@ public class Network {
             if (pointer.getInputs().get(i) instanceof String) {
                 // Check if the string is an un-atomised expression
                 if (((String) pointer.getInputs().get(i)).contains("!")
-                && ((String) pointer.getInputs().get(i)).contains("||")
-                && ((String) pointer.getInputs().get(i)).contains("&&")) {
+                || ((String) pointer.getInputs().get(i)).contains("||")
+                || ((String) pointer.getInputs().get(i)).contains("&&")) {
                     // Replace the un-atomised expression with a new neuron, make new neuron the pointer
                     Neuron newNeuron = new Neuron(inputs, neuronType, pointer);
                     pointer.getInputs().set(i, newNeuron);
@@ -37,10 +38,43 @@ public class Network {
                 }
             }
         }
+        System.out.println("DEBUG:" + neuronType);
+    }
+
+    public void testNetwork(Neuron currentNeuron) {
+
+        System.out.println("Current Neuron: " + currentNeuron);
+        ArrayList<Object> inputs = currentNeuron.getInputs();
+        System.out.println("Inputs: " + inputs);
+        System.out.println("Neuron Type: " + currentNeuron.getNeuronType());
+        System.out.println("----------");
+
+        for (Object input : inputs) {
+            if (input instanceof Neuron) {
+                testNetwork((Neuron) input);
+            }
+        }
     }
 
     public void printNetwork(Neuron currentNeuron) {
-        // TODO: Network printing method
+
+        System.out.println("|\b|\b|\b");
+
+        switch (currentNeuron.getNeuronType()) {
+            case "AND":
+                System.out.println("*" + currentNeuron.getInputs().size());
+                break;
+            case "OR":
+                System.out.println("*1");
+                break;
+            case "LOGICAL_COMPLEMENT":
+                System.out.println("*0");
+                break;
+        }
+    }
+
+    public void optimiseNetwork() {
+        // TODO: Network optimisation algorithm
     }
 
     static class Neuron {
