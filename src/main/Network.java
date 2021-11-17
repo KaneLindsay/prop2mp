@@ -80,20 +80,41 @@ public class Network {
         }
     }
 
-    public void printNetwork(Neuron currentNeuron) {
+    public void printNetwork(Neuron neuron) {
+        Stack<Neuron> stack = new Stack<>();
+        System.out.println("|\n|");
+        stack.push(neuron);
 
-        System.out.println("|\b|\b|\b");
+        String breadth = "";
 
-        switch (currentNeuron.getNeuronType()) {
-            case "AND":
-                System.out.println("*" + currentNeuron.getInputs().size());
-                break;
-            case "OR":
-                System.out.println("*1");
-                break;
-            case "LOGICAL_COMPLEMENT":
-                System.out.println("*0");
-                break;
+        while (!stack.isEmpty()) {
+
+            neuron = stack.pop();
+            System.out.println(breadth + "*" + neuron.getThreshold());
+
+
+            for (int i = 0; i < neuron.getInputs().size(); i++) {
+                System.out.println(breadth + "|");
+                if (i == neuron.getInputs().size()-1 ) {
+                    if (neuron.getInputs().get(i) instanceof String) {
+                        System.out.println(breadth + "|_" + neuron.getWeight() + "_" + neuron.getInputs().get(i));
+                    }
+                    else {
+                        System.out.println(breadth + "|_" + neuron.getWeight() + "_");
+                    }
+                } else {
+                    System.out.println(breadth + "|_" + neuron.getWeight());
+                }
+            }
+
+            breadth = breadth + "    ";
+
+            for (int i = 0; i < neuron.getInputs().size(); i++) {
+                if (neuron.getInputs().get(i) instanceof Neuron) {
+                    stack.push((Neuron) neuron.getInputs().get(i));
+                }
+
+            }
         }
     }
 
@@ -124,12 +145,11 @@ public class Network {
                     currentNeuron.setInputs(mergedInputs);
 
                     // If the child node had neuron inputs, set their parent as the current node instead.
-                    for (int j = 0; j < childInputs.size(); j++) {
-                        if (childInputs.get(j) instanceof Neuron) {
-                            ((Neuron) childInputs.get(j)).setParent(currentNeuron);
+                    for (Object childInput : childInputs) {
+                        if (childInput instanceof Neuron) {
+                            ((Neuron) childInput).setParent(currentNeuron);
                         }
                     }
-                    System.out.println("Optimisation Found.");
                     optimisedFlag = false;
                     break;
                 }

@@ -41,18 +41,18 @@ public class Main {
         Expression root = cu.findAll(Expression.class).get(0);
 
         Network network = ParseProp(root, new Network());
-        System.out.println("~~~~~~~~~~~~~~~~~~~~~~~");
-        network.testNetwork(network.getRoot());
         network.optimiseNetwork(network.getRoot());
-        System.out.println("************************");
         network.testNetwork(network.getRoot());
+
+        System.out.println("NETWORK MAP");
+        network.printNetwork(network.getRoot());
 
     }
 
 
     public static Network ParseProp (Expression expr, Network network) throws Exception {
 
-        System.out.println("--------------------------------");
+        // System.out.println("--------------------------------");
 
         // Entering brackets
         if (expr instanceof EnclosedExpr) {
@@ -61,14 +61,10 @@ public class Main {
 
         if (expr instanceof BinaryExpr) {
 
-            System.out.println(((BinaryExpr) expr).getLeft().toString());
-            System.out.println(((BinaryExpr) expr).getRight().toString());
-            System.out.println(((BinaryExpr) expr).getOperator().toString());
+        /*System.out.println(((BinaryExpr) expr).getLeft().toString());
+        System.out.println(((BinaryExpr) expr).getRight().toString());
+        System.out.println(((BinaryExpr) expr).getOperator().toString());*/
 
-
-            if (expr instanceof EnclosedExpr) {
-                expr = ((EnclosedExpr) expr).getInner();
-            }
 
             ArrayList<Object> neuronInputs = new ArrayList<>();
             neuronInputs.add(((BinaryExpr) expr).getLeft().toString());
@@ -96,12 +92,8 @@ public class Main {
 
         if (expr instanceof UnaryExpr) { //
 
-            System.out.println(((UnaryExpr) expr).getOperator());
-            System.out.println(((UnaryExpr) expr).getExpression());
-
-            if (expr instanceof EnclosedExpr) {
-                expr = ((EnclosedExpr) expr).getInner();
-            }
+/*            System.out.println(((UnaryExpr) expr).getOperator());
+            System.out.println(((UnaryExpr) expr).getExpression());*/
 
             ArrayList<Object> neuronInputs = new ArrayList<>();
             neuronInputs.add(((UnaryExpr) expr).getExpression().toString());
