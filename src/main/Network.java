@@ -2,11 +2,13 @@ package main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 public class Network {
 
     Neuron root;
     Neuron pointer; // Points to the last added neuron
+    Stack<Neuron> incompleteNeurons = new Stack<>();
 
     // No constructor currently
 
@@ -20,25 +22,46 @@ public class Network {
         if (root == null) {
             root = new Neuron(inputs, neuronType,null);
             pointer = root;
-            System.out.println("DEBUG ROOT:" + neuronType);
+            incompleteNeurons.push(root);
             return;
         }
 
-        // The parent is the receiver of whatever expression this neuron will replace...?
+        // Find if there are more than 1 un-atomised expression in the neuron's inputs.
+        int expressionCounter = 0;
         for (int i = 0; i < pointer.getInputs().size(); i++) {
             if (pointer.getInputs().get(i) instanceof String) {
                 // Check if the string is an un-atomised expression
                 if (((String) pointer.getInputs().get(i)).contains("!")
-                || ((String) pointer.getInputs().get(i)).contains("||")
-                || ((String) pointer.getInputs().get(i)).contains("&&")) {
-                    // Replace the un-atomised expression with a new neuron, make new neuron the pointer
-                    Neuron newNeuron = new Neuron(inputs, neuronType, pointer);
-                    pointer.getInputs().set(i, newNeuron);
-                    pointer = newNeuron;
+                        || ((String) pointer.getInputs().get(i)).contains("||")
+                        || ((String) pointer.getInputs().get(i)).contains("&&")) {
+                    expressionCounter++;
                 }
             }
         }
-        System.out.println("DEBUG:" + neuronType);
+
+        if (expressionCounter > 1) {
+            incompleteNeurons.push(pointer);
+        } else if (expressionCounter == 0) {
+            pointer = incompleteNeurons.pop();
+        }
+
+        for (int i = 0; i < pointer.getInputs().size(); i++) {
+            if (pointer.getInputs().get(i) instanceof String) {
+                // Check if the string is an un-atomised expression
+                if (((String) pointer.getInputs().get(i)).contains("!")
+                        || ((String) pointer.getInputs().get(i)).contains("||")
+                        || ((String) pointer.getInputs().get(i)).contains("&&")) {
+                    // Replace the un-atomised expression with a new neuron, make new neuron the pointer
+                    Neuron newNeuron = new Neuron(inputs, neuronType, pointer);
+
+                    ArrayList<Object> pointerInputs = pointer.getInputs();
+                    pointerInputs.set(i, newNeuron);
+                    pointer.setInputs(pointerInputs);
+                    pointer = newNeuron;
+                    break;
+                }
+            }
+        }
     }
 
     public void testNetwork(Neuron currentNeuron) {
@@ -51,6 +74,7 @@ public class Network {
 
         for (Object input : inputs) {
             if (input instanceof Neuron) {
+
                 testNetwork((Neuron) input);
             }
         }
@@ -73,14 +97,56 @@ public class Network {
         }
     }
 
-    public void optimiseNetwork() {
-        // TODO: Network optimisation algorithm
+    public void optimiseNetwork(Neuron rootNeuron) {
+
+        Stack<Neuron> stack = new Stack<>();
+        stack.push(rootNeuron);
+        boolean optimisedFlag = true;
+
+        while (!(stack.isEmpty())) {
+            Neuron currentNeuron = stack.pop();
+
+            String currNeuronType = currentNeuron.getNeuronType();
+            ArrayList<Object> inputs = currentNeuron.getInputs();
+
+            // For all inputs of neuron
+            for (int i = 0; i < inputs.size(); i++) {
+                // This will get the first neuron input with the same type as the current neuron.
+                if (inputs.get(i) instanceof Neuron && ((Neuron) inputs.get(i)).getNeuronType().equals(currNeuronType)){
+
+                    // Merge the inputs of the child neuron & the current neuron, excluding the child neuron itself.
+                    ArrayList<Object> childInputs = ((Neuron) inputs.get(i)).getInputs();
+                    inputs.remove(i);
+                    ArrayList<Object> mergedInputs = new ArrayList<>();
+                    mergedInputs.addAll(inputs);
+                    mergedInputs.addAll(childInputs);
+                    // Set the inputs of the current neuron as the merged inputs.
+                    currentNeuron.setInputs(mergedInputs);
+
+                    // If the child node had neuron inputs, set their parent as the current node instead.
+                    for (int j = 0; j < childInputs.size(); j++) {
+                        if (inputs.get(i) instanceof Neuron) {
+                            ((Neuron) inputs.get(i)).setParent(currentNeuron);
+                        }
+                    }
+                    System.out.println("Optimisation Found.");
+                    optimisedFlag = false;
+                    break;
+                }
+            }
+            for (int k = inputs.size()-1; k >= 0; k--) {
+                if (inputs.get(k) instanceof Neuron) {
+                    stack.push((Neuron) inputs.get(k));
+                }
+            }
+            if (!optimisedFlag) { optimiseNetwork(rootNeuron); }
+        }
     }
 
     static class Neuron {
-        Neuron parent;
-        ArrayList<Object> inputs;
-        String neuronType;
+        private Neuron parent;
+        private ArrayList<Object> inputs;
+        private String neuronType;
 
         public Neuron(ArrayList<Object> inputs, String neuronType, Neuron parent) {
             this.parent = parent;
@@ -96,6 +162,10 @@ public class Network {
             return parent;
         }
 
+        public void setParent(Neuron parent) {
+            this.parent = parent;
+        }
+
         public String getNeuronType() {
             return neuronType;
         }
@@ -104,6 +174,29 @@ public class Network {
             return inputs;
         }
 
-    }
+        public int getWeight() {
+            switch (getNeuronType()) {
+                case "OR":
+                case "AND":
+                    return (1);
+                case "LOGICAL_COMPLEMENT":
+                    return (-1);
+                default:
+                    return 0;
+            }
+        }
 
+        public String getThreshold(){
+            switch (getNeuronType()) {
+                case "OR":
+                    return ("1");
+                case "LOGICAL_COMPLEMENT":
+                    return ("0");
+                case "AND":
+                    return String.valueOf(getInputs().size());
+                default:
+                    return "";
+            }
+        }
+    }
 }

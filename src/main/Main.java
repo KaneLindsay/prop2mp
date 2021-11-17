@@ -43,6 +43,9 @@ public class Main {
         Network network = ParseProp(root, new Network());
         System.out.println("~~~~~~~~~~~~~~~~~~~~~~~");
         network.testNetwork(network.getRoot());
+        network.optimiseNetwork(network.getRoot());
+        System.out.println("************************");
+        network.testNetwork(network.getRoot());
 
     }
 
@@ -61,6 +64,11 @@ public class Main {
             System.out.println(((BinaryExpr) expr).getLeft().toString());
             System.out.println(((BinaryExpr) expr).getRight().toString());
             System.out.println(((BinaryExpr) expr).getOperator().toString());
+
+
+            if (expr instanceof EnclosedExpr) {
+                expr = ((EnclosedExpr) expr).getInner();
+            }
 
             ArrayList<Object> neuronInputs = new ArrayList<>();
             neuronInputs.add(((BinaryExpr) expr).getLeft().toString());
@@ -91,26 +99,27 @@ public class Main {
             System.out.println(((UnaryExpr) expr).getOperator());
             System.out.println(((UnaryExpr) expr).getExpression());
 
+            if (expr instanceof EnclosedExpr) {
+                expr = ((EnclosedExpr) expr).getInner();
+            }
+
             ArrayList<Object> neuronInputs = new ArrayList<>();
             neuronInputs.add(((UnaryExpr) expr).getExpression().toString());
             String operator = (((UnaryExpr) expr).getOperator().toString());
 
             network.addNeuron(neuronInputs, operator);
 
-            Expression node2 = expr;
+            //Expression node2 = expr;
             Expression child2 = ((UnaryExpr) expr).getExpression();
             // for each node, also need to check whether it is enclosed expression with brackets
             if (child2 instanceof EnclosedExpr) {
-                //System.out.println(((EnclosedExpr) child2).getInner());
-                node2 = ((EnclosedExpr) child2).getInner();
+                child2 = ((EnclosedExpr) child2).getInner();
             }
 
-            if (node2 instanceof BinaryExpr) {
-                ParseProp(node2, network);
+            if (child2 instanceof BinaryExpr) {
+                ParseProp(child2, network);
             }
-            if (node2 instanceof UnaryExpr) {
-                ParseProp(node2, network);
-            }
+
 
         }
         return network;
