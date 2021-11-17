@@ -125,8 +125,8 @@ public class Network {
 
                     // If the child node had neuron inputs, set their parent as the current node instead.
                     for (int j = 0; j < childInputs.size(); j++) {
-                        if (inputs.get(i) instanceof Neuron) {
-                            ((Neuron) inputs.get(i)).setParent(currentNeuron);
+                        if (childInputs.get(j) instanceof Neuron) {
+                            ((Neuron) childInputs.get(j)).setParent(currentNeuron);
                         }
                     }
                     System.out.println("Optimisation Found.");
