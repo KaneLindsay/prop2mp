@@ -85,35 +85,38 @@ public class Network {
         System.out.println("|\n|");
         stack.push(neuron);
 
-        String breadth = "";
+        String indent = "";
 
         while (!stack.isEmpty()) {
 
             neuron = stack.pop();
-            System.out.println(breadth + "*" + neuron.getThreshold());
+            System.out.println(indent + "*" + neuron.getThreshold());
 
+            ArrayList<String> atomInputs = new ArrayList<>();
+            ArrayList<Neuron> neuronInputs = new ArrayList<>();
 
             for (int i = 0; i < neuron.getInputs().size(); i++) {
-                System.out.println(breadth + "|");
-                if (i == neuron.getInputs().size()-1 ) {
-                    if (neuron.getInputs().get(i) instanceof String) {
-                        System.out.println(breadth + "|_" + neuron.getWeight() + "_" + neuron.getInputs().get(i));
-                    }
-                    else {
-                        System.out.println(breadth + "|_" + neuron.getWeight() + "_");
-                    }
+                if (neuron.getInputs().get(i) instanceof Neuron) {
+                    neuronInputs.add((Neuron) neuron.getInputs().get(i));
                 } else {
-                    System.out.println(breadth + "|_" + neuron.getWeight());
+                    atomInputs.add((String) neuron.getInputs().get(i));
                 }
             }
 
-            breadth = breadth + "    ";
+            for (int i = 0; i < atomInputs.size(); i++) {
+                System.out.println(indent + "|__" + neuron.getWeight() + "__" + atomInputs.get(i));
+            }
+
+            for (int i = 0; i < neuronInputs.size(); i++) {
+                System.out.println(indent + "|__" + neuron.getWeight() + "__");
+            }
+
+            indent = indent + "      ";
 
             for (int i = 0; i < neuron.getInputs().size(); i++) {
                 if (neuron.getInputs().get(i) instanceof Neuron) {
                     stack.push((Neuron) neuron.getInputs().get(i));
                 }
-
             }
         }
     }
