@@ -41,7 +41,6 @@ public class Main {
 
         Network network = parseProp(root, new Network());
         network.optimiseNetwork(network.getRoot());
-        network.testNetwork(network.getRoot());
 
         System.out.println("NETWORK MAP");
         network.printNetwork(network.getRoot(), "");

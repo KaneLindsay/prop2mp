@@ -66,7 +66,7 @@ public class Network {
         }
     }
 
-    public void testNetwork(Neuron currentNeuron) {
+/*    public void testNetwork(Neuron currentNeuron) {
 
         System.out.println("Current Neuron: " + currentNeuron);
         ArrayList<Object> inputs = currentNeuron.getInputs();
@@ -80,7 +80,7 @@ public class Network {
                 testNetwork((Neuron) input);
             }
         }
-    }
+    }*/
 
     public void printNetwork(Neuron neuron, String indent) {
 
@@ -101,13 +101,13 @@ public class Network {
         // In the case the neuron does not have any more input neurons to iterate to.
         if (!anyNeuronInputs) {
             for (int i = 0; i < neuron.getInputs().size(); i++) {
-                System.out.println(indent);
+                System.out.println();
                 System.out.print(indent + "|__" + neuron.getWeight() + "__" + neuron.getInputs().get(i));
             }
         } else {
             // Make recursive calls to print input neurons.
             for (int i = 0; i < neuron.getInputs().size(); i++) {
-                System.out.println(indent);
+                System.out.println();
                 System.out.print(indent + "|__" + neuron.getWeight() + "__");
 
                 // If an input is not a neuron, just print it.
