@@ -102,17 +102,16 @@ public class Network {
             }
         } else {
             for (int i = 0; i < neuron.getInputs().size(); i++) {
-                System.out.println(indent + "|");
+                System.out.println(indent);
                 System.out.print(indent + "|__" + neuron.getWeight() + "__");
-                if (i == neuron.getInputs().size() - 1 && neuron.getInputs().get(i) instanceof Neuron) {
+                if (neuron.getInputs().get(i) instanceof String) {
+                    System.out.print(neuron.getInputs().get(i));
+                } else if (i == neuron.getInputs().size() - 1 && neuron.getInputs().get(i) instanceof Neuron) {
                     printNetwork((Neuron) neuron.getInputs().get(i), indent + "       ");
                 } else if (neuron.getInputs().get(i) instanceof Neuron) {
                     printNetwork((Neuron) neuron.getInputs().get(i), indent + "|      ");
-                } else {
-                    System.out.print(indent + "|__" + neuron.getWeight() + "__" + neuron.getInputs().get(i));
                 }
             }
-            System.out.println(indent);
         }
     }
 
