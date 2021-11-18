@@ -84,8 +84,10 @@ public class Network {
 
     public void printNetwork(Neuron neuron, String indent) {
 
-        boolean anyNeuronInputs = false;
+        // TODO: Stop the errant Pipe characters printing after some inputs.
 
+        // Check if there are any input neurons to the current neuron.
+        boolean anyNeuronInputs = false;
         for (int i = 0; i < neuron.getInputs().size(); i++)	{
             if (neuron.getInputs().get(i) instanceof Neuron) {
                 anyNeuronInputs = true;
@@ -93,22 +95,27 @@ public class Network {
             }
         }
 
-        System.out.println("*" + neuron.getThreshold());
+        // Print neuron threshold.
+        System.out.print("*" + neuron.getThreshold());
 
+        // In the case the neuron does not have any more input neurons to iterate to.
         if (!anyNeuronInputs) {
             for (int i = 0; i < neuron.getInputs().size(); i++) {
-                System.out.println(indent + "|");
+                System.out.println(indent);
                 System.out.print(indent + "|__" + neuron.getWeight() + "__" + neuron.getInputs().get(i));
             }
         } else {
+            // Make recursive calls to print input neurons.
             for (int i = 0; i < neuron.getInputs().size(); i++) {
                 System.out.println(indent);
                 System.out.print(indent + "|__" + neuron.getWeight() + "__");
+
+                // If an input is not a neuron, just print it.
                 if (neuron.getInputs().get(i) instanceof String) {
                     System.out.print(neuron.getInputs().get(i));
                 } else if (i == neuron.getInputs().size() - 1 && neuron.getInputs().get(i) instanceof Neuron) {
                     printNetwork((Neuron) neuron.getInputs().get(i), indent + "       ");
-                } else if (neuron.getInputs().get(i) instanceof Neuron) {
+                } else {
                     printNetwork((Neuron) neuron.getInputs().get(i), indent + "|      ");
                 }
             }
