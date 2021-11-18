@@ -1,22 +1,28 @@
 package main;
-
-import org.checkerframework.checker.units.qual.A;
-
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Stack;
+
+/**
+ * The Network object contains the structure and all Neurons of the McCulloch-Pitts neural network.
+ * It also contains methods to add new Neurons while building the network, to print a visualisation
+ * of the network, and to optimise the network to the smallest possible amount of neurons.
+ *
+ * @author  Kane Lindsay
+ * @version 1.0
+ * @since   2021-11-18
+ */
 
 public class Network {
 
     Neuron root;
-    Neuron pointer; // Points to the last added neuron
+    Neuron pointer; // Points to neuron to which a new neuron could be added as an input.
     Stack<Neuron> incompleteNeurons = new Stack<>();
 
-    // No constructor currently
 
     public Neuron getRoot() {
         return root;
     }
+
 
     public void addNeuron(ArrayList<Object> inputs, String neuronType) {
 
@@ -41,6 +47,8 @@ public class Network {
             }
         }
 
+        // If there are no possible places for a new neuron at the current pointed neuron,
+        // Get the last visited incomplete neuron from the stack and point there instead.
         if (expressionCounter > 1) {
             incompleteNeurons.push(pointer);
         } else if (expressionCounter == 0) {
@@ -66,25 +74,8 @@ public class Network {
         }
     }
 
-/*    public void testNetwork(Neuron currentNeuron) {
-
-        System.out.println("Current Neuron: " + currentNeuron);
-        ArrayList<Object> inputs = currentNeuron.getInputs();
-        System.out.println("Inputs: " + inputs);
-        System.out.println("Neuron Type: " + currentNeuron.getNeuronType());
-        System.out.println("----------");
-
-        for (Object input : inputs) {
-            if (input instanceof Neuron) {
-
-                testNetwork((Neuron) input);
-            }
-        }
-    }*/
 
     public void printNetwork(Neuron neuron, String indent) {
-
-        // TODO: Stop the errant Pipe characters printing after some inputs.
 
         // Check if there are any input neurons to the current neuron.
         boolean anyNeuronInputs = false;
@@ -123,9 +114,8 @@ public class Network {
     }
 
 
-
     public void optimiseNetwork(Neuron rootNeuron) {
-
+        // Set up a pre-order traversal of the network tree.
         Stack<Neuron> stack = new Stack<>();
         stack.push(rootNeuron);
         boolean optimisedFlag = true;
@@ -160,19 +150,22 @@ public class Network {
                     break;
                 }
             }
+            // Push input nodes to continue pre-order traversal.
             for (int k = inputs.size()-1; k >= 0; k--) {
                 if (inputs.get(k) instanceof Neuron) {
                     stack.push((Neuron) inputs.get(k));
                 }
             }
+            // Run the algorithm again on the network until no more optimisations are found.
             if (!optimisedFlag) { optimiseNetwork(rootNeuron); }
         }
     }
 
+
     static class Neuron {
         private Neuron parent;
         private ArrayList<Object> inputs;
-        private String neuronType;
+        private final String neuronType;
 
         public Neuron(ArrayList<Object> inputs, String neuronType, Neuron parent) {
             this.parent = parent;
@@ -200,6 +193,7 @@ public class Network {
             return inputs;
         }
 
+        // Weights are always the same for every input of each neuron type.
         public int getWeight() {
             switch (getNeuronType()) {
                 case "OR":
@@ -212,6 +206,9 @@ public class Network {
             }
         }
 
+        // Threshold for OR is always 1 as OR only requires one active input.
+        // Threshold for LOGICAL_COMPLEMENT is always 0 as it always outputs 1 unless deactivated by an inhibitory input
+        // Threshold for AND is the number of its inputs, as they all must be active to fire the neuron.
         public String getThreshold(){
             switch (getNeuronType()) {
                 case "OR":
