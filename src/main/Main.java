@@ -12,7 +12,6 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeS
 
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.List;
 
 
 public class Main {
@@ -40,17 +39,17 @@ public class Main {
 
         Expression root = cu.findAll(Expression.class).get(0);
 
-        Network network = ParseProp(root, new Network());
+        Network network = parseProp(root, new Network());
         network.optimiseNetwork(network.getRoot());
         network.testNetwork(network.getRoot());
 
         System.out.println("NETWORK MAP");
-        network.printNetwork(network.getRoot());
+        network.printNetwork(network.getRoot(), 0);
 
     }
 
 
-    public static Network ParseProp (Expression expr, Network network) throws Exception {
+    public static Network parseProp(Expression expr, Network network) throws Exception {
 
         // System.out.println("--------------------------------");
 
@@ -83,10 +82,10 @@ public class Main {
                 right = ((EnclosedExpr) ((BinaryExpr) expr).getRight()).getInner();
             }
             if (left instanceof BinaryExpr ||left instanceof UnaryExpr) {
-                ParseProp(((BinaryExpr) expr).getLeft(), network);
+                parseProp(((BinaryExpr) expr).getLeft(), network);
             }
             if (right instanceof BinaryExpr ||right instanceof UnaryExpr) {
-                ParseProp(((BinaryExpr) expr).getRight(), network);
+                parseProp(((BinaryExpr) expr).getRight(), network);
             }
         }
 
@@ -109,7 +108,7 @@ public class Main {
             }
 
             if (child2 instanceof BinaryExpr) {
-                ParseProp(child2, network);
+                parseProp(child2, network);
             }
 
 

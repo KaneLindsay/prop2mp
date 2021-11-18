@@ -1,5 +1,7 @@
 package main;
 
+import org.checkerframework.checker.units.qual.A;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -80,7 +82,7 @@ public class Network {
         }
     }
 
-    public void printNetwork(Neuron neuron) {
+    public void printNetwork(Neuron neuron, int indentLevel) {
         Stack<Neuron> stack = new Stack<>();
         System.out.println("|\n|");
         stack.push(neuron);
@@ -111,7 +113,7 @@ public class Network {
                 System.out.println(indent + "|__" + neuron.getWeight() + "__");
             }
 
-            indent = indent + "      ";
+            indent = indent + "     ";
 
             for (int i = 0; i < neuron.getInputs().size(); i++) {
                 if (neuron.getInputs().get(i) instanceof Neuron) {
