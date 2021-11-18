@@ -44,7 +44,7 @@ public class Main {
         network.testNetwork(network.getRoot());
 
         System.out.println("NETWORK MAP");
-        network.printNetwork(network.getRoot(), 0);
+        network.printNetwork(network.getRoot(), "");
 
     }
 

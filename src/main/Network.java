@@ -82,46 +82,41 @@ public class Network {
         }
     }
 
-    public void printNetwork(Neuron neuron, int indentLevel) {
-        Stack<Neuron> stack = new Stack<>();
-        System.out.println("|\n|");
-        stack.push(neuron);
+    public void printNetwork(Neuron neuron, String indent) {
 
-        String indent = "";
+        boolean anyNeuronInputs = false;
 
-        while (!stack.isEmpty()) {
-
-            neuron = stack.pop();
-            System.out.println(indent + "*" + neuron.getThreshold());
-
-            ArrayList<String> atomInputs = new ArrayList<>();
-            ArrayList<Neuron> neuronInputs = new ArrayList<>();
-
-            for (int i = 0; i < neuron.getInputs().size(); i++) {
-                if (neuron.getInputs().get(i) instanceof Neuron) {
-                    neuronInputs.add((Neuron) neuron.getInputs().get(i));
-                } else {
-                    atomInputs.add((String) neuron.getInputs().get(i));
-                }
-            }
-
-            for (int i = 0; i < atomInputs.size(); i++) {
-                System.out.println(indent + "|__" + neuron.getWeight() + "__" + atomInputs.get(i));
-            }
-
-            for (int i = 0; i < neuronInputs.size(); i++) {
-                System.out.println(indent + "|__" + neuron.getWeight() + "__");
-            }
-
-            indent = indent + "     ";
-
-            for (int i = 0; i < neuron.getInputs().size(); i++) {
-                if (neuron.getInputs().get(i) instanceof Neuron) {
-                    stack.push((Neuron) neuron.getInputs().get(i));
-                }
+        for (int i = 0; i < neuron.getInputs().size(); i++)	{
+            if (neuron.getInputs().get(i) instanceof Neuron) {
+                anyNeuronInputs = true;
+                break;
             }
         }
+
+        System.out.println("*" + neuron.getThreshold());
+
+        if (!anyNeuronInputs) {
+            for (int i = 0; i < neuron.getInputs().size(); i++) {
+                System.out.println(indent + "|");
+                System.out.print(indent + "|__" + neuron.getWeight() + "__" + neuron.getInputs().get(i));
+            }
+        } else {
+            for (int i = 0; i < neuron.getInputs().size(); i++) {
+                System.out.println(indent + "|");
+                System.out.print(indent + "|__" + neuron.getWeight() + "__");
+                if (i == neuron.getInputs().size() - 1 && neuron.getInputs().get(i) instanceof Neuron) {
+                    printNetwork((Neuron) neuron.getInputs().get(i), indent + "       ");
+                } else if (neuron.getInputs().get(i) instanceof Neuron) {
+                    printNetwork((Neuron) neuron.getInputs().get(i), indent + "|      ");
+                } else {
+                    System.out.print(indent + "|__" + neuron.getWeight() + "__" + neuron.getInputs().get(i));
+                }
+            }
+            System.out.println(indent);
+        }
     }
+
+
 
     public void optimiseNetwork(Neuron rootNeuron) {
 
